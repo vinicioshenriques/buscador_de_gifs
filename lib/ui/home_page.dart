@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map> _getGifs() async {
     http.Response response;
-    if (_search == null)
+    if (_search == null || _search == '')
       response = await http.get(urlTrend);
     else
       response = await http.get(
@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
               onSubmitted: (text) {
                 setState(() {
                   _search = text;
+                  _offset = 0;
                 });
               },
             ),
@@ -121,10 +122,19 @@ class _HomePageState extends State<HomePage> {
         } else {
           return Container(
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                setState(() {
+                  _offset += 19;
+                });
+              },
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add),
+                  Icon(Icons.add, color: Colors.white, size: 70.0),
+                  Text(
+                    'Carregar mais...',
+                    style: TextStyle(color: Colors.white, fontSize: 22.0),
+                  )
                 ],
               ),
             ),
