@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:buscador_de_gifs/ui/gif_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 const urlTrend =
     'https://api.giphy.com/v1/gifs/trending?api_key=PE6IlQgRBU9lxiQ0YOhFcLhJREUzxhP8&limit=20&rating=g';
@@ -17,7 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map> _getGifs() async {
     http.Response response;
-    if (_search == null || _search == '')
+    if (_search == null || _search.isEmpty)
       response = await http.get(urlTrend);
     else
       response = await http.get(
@@ -30,7 +33,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getGifs().then((value) => print(value));
   }
 
   @override
@@ -96,7 +98,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   int _getCount(List data) {
-    if (_search == null) {
+    if (_search == null || _search.isEmpty) {
       return data.length;
     } else {
       return data.length + 1;
@@ -112,9 +114,22 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (context, index) {
         if (_search == null || index < snapshot.data['data'].length) {
           return GestureDetector(
-            onTap: () {},
-            child: Image.network(
-              snapshot.data['data'][index]['images']['fixed_height']['url'],
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        GifPage(snapshot.data['data'][index])),
+              );
+            },
+            onLongPress: () {
+              Share.share(snapshot.data['data'][index]['images']['fixed_height']
+                  ['url']);
+            },
+            child: FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: snapshot.data['data'][index]['images']['fixed_height']
+                  ['url'],
               height: 300.0,
               fit: BoxFit.cover,
             ),
